@@ -12,22 +12,25 @@ client.on("error", function (err) {
 	console.log("Connection timeout in: " + (4 - count));
 });
 
-console.dir(client.llen(users));
+
 function addUser (name) {
 	client.rpush("users", name);
-	client.hset("user:" + client.llen("users"), "name", name);
-	console.dir("I worked");
+	client.llen('users', function(err, count){
+		client.hset("user:" + count, "name", name);
+		console.dir(count);
+	});
 }
 
 addUser("jimmy");
-console.dir(client.llen("users"));
+
+
+
 //client.hmset("user:1", "name", "tolga", "work", "5");
 //client.hmset("user:2", "name", "bill", "work", "8");
 
 //client.hgetall("user:1", function(err, response) {
 //console.dir(response);
 //});
-
 for(var i = 0; i < 5; i++) {
 	client.hgetall("user:" + i, function(err, response) {
 		console.dir(response);
