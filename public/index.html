@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html ng-app = "gamification">
+
+<head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src = "app_ui.js"></script>
+<script type="text/javascript" src="application.js"></script>
+
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+<script type="text/javascript">
+
+	(function()
+	{
+		var po = document.createElement('script');
+		po.type = 'text/javascript';
+		po.async = true;
+		po.src = 'https://apis.google.com/js/client:plusone.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(po, s);
+	})();
+
+	function signinCallback(authResult)
+	{
+		if (authResult['status']['signed_in'])
+		{
+			// Update the app to reflect a signed in user
+			// Hide the sign-in button now that the user is authorized, for example:
+			//document.getElementById('signinButton').setAttribute('style', 'display: none');
+
+			gapi.client.load('plus', 'v1', function()
+			{
+				var request = gapi.client.plus.people.get({'userId' : 'me'});
+
+				request.execute(function(resp)
+				{
+					console.log('Retrieved profile for: ' + resp.displayName);
+					$('#user').text(resp.displayName + ' is currently logged in.');
+					$('#activities').attr ('style', 'display: initial;');
+				});
+			});
+		}
+		else
+		{
+			// Update the app to reflect a signed out user
+			// Possible error values:
+			//   "user_signed_out" - User is signed-out
+			//   "access_denied" - User denied access to your app
+			//   "immediate_failed" - Could not automatically log in the user
+			console.log('Sign-in state: ' + authResult['error']);
+			$('#user').text('');
+			
+			var attribute = $('#dropDown').attr ('style');
+			$('#activities').attr ('style', 'display: none;');
+		}
+	}
+</script>
+
+
+</head>
+
+<body ng-controller = "mainCtrl">
+	
+<div class = "container">
+
+	<div class = "row">
+	
+		<div class = "panel panel-primary row text-center col-md-4" style = "margin-top: 5%; margin-left: 30%; margin-right: 40%;">
+			<div class = "panel-heading" style = "margin-left: -15px; margin-right: -15px;">
+				<h1>WorkPlay Login</h1>
+			</div>
+		</div>
+	
+		<div class = "panel panel-info row text-center col-md-4" style = "margin-left: 30%; margin-right: 40%; margin-top: -20px;">
+			<div class =  "panel-heading" style = "margin-left: -15px; margin-right: -15px;">			
+		
+				<div id = "user" class = "row text-center"></div>
+			
+				<br>
+			
+				<span id="signinButton"> 
+						<span class="g-signin"
+							data-callback="signinCallback"
+							data-clientid="194099115650-d8068ki4h69ghhjuibfkkdgsegmb3t37.apps.googleusercontent.com"
+							data-cookiepolicy="single_host_origin"
+							data-requestvisibleactions="http://schemas.google.com/AddActivity"
+							data-scope="https://www.googleapis.com/auth/plus.login">
+						</span>
+				</span>		
+			
+				<br>
+				<br>
+				<br>
+				
+				<div class = "row text-center">
+					<a href = "#" ng-click = "logOut()" style = "color: #FF0000;">Log Out</a>
+				</div>			
+			</div>
+		</div>
+			
+		<div id = "activities" style = "display: none">;
+			<div class = "panel panel-success row text-center col-md-4" style = "margin-left: 30%; margin-right: 40%;">
+				<div class = "panel-heading" style = "margin-left: -15px; margin-right: -15px;">
+					<h3 id = "activity">Activities</h3> 
+					<select id = "dropDown">
+						<option ng-repeat = "activity in activities" value = "{{activity}}">{{activity}}</option>									
+					</select>
+					
+					<br>
+					<br>
+				
+					<button type = "button" class = "btn btn-primary btn-default" ng-click = "submit ()">Submit</button>
+				</div>				
+			</div>
+		</div>
+		
+		<div class = "panel panel-danger row text-center col-md-4" style = "margin-left: 30%; margin-right: 40%;">
+			<table class = "table table-bordered">
+				<thead>
+					<tr>
+						<th>Rank/Standing</th>
+						<th>Name</th>
+						<th>Points</th>
+					</tr>
+				</thead>
+				<tbody id = "scoreboardBody">
+					<tr>
+						<td>1</td>
+						<td>Humphrey Huang</td>
+						<td>300</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>Superman Joe</td>
+						<td>250</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>	
+
+</body>
+
+</html>
