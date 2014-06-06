@@ -16,6 +16,9 @@
 
 <script type="text/javascript">
 	
+	var googleSignedOn = false;
+	var facebookSignedOn = false;
+	
 	(function()
 	{
 		var po = document.createElement('script');
@@ -40,6 +43,7 @@
 
 				request.execute(function(resp)
 				{
+					googleSignedOn = true;
 					console.log('Retrieved profile for: ' + resp.displayName);
 					$('#user').text(resp.displayName + '(Google) is currently logged in.');
 					$('#activities').attr ('style', 'display: initial;');
@@ -54,9 +58,13 @@
 			//   "access_denied" - User denied access to your app
 			//   "immediate_failed" - Could not automatically log in the user
 			console.log('Sign-in state: ' + authResult['error']);
-			$('#user').text('');
 			
-			$('#activities').attr ('style', 'display: none;');
+			googleSignedOn = false;
+			if (facebookSignedOn == false)
+			{
+				$('#user').text('');					
+				$('#activities').attr ('style', 'display: none;');
+			}
 		}
 	}
 </script>
@@ -90,6 +98,7 @@ function statusChangeCallback(response)
 		    var name = info.substring (info.indexOf ('"name":') + 8);
 		    name = name.substring (0, name.indexOf('"'));
 
+		    facebookSignedOn = true;
 			$('#user').text(name + '(Facebook) is currently logged in.');
 			$('#activities').attr ('style', 'display: initial;');
 		});
@@ -104,8 +113,14 @@ function statusChangeCallback(response)
 	  // The person is not logged into Facebook, so we're not sure if
 	  // they are logged into this app or not.
 	  console.log ("Not logged in");
+	  
+	  facebookSignedOn == false;
+	  
+	  if (googleSignedOn == false)
+	  {
 	  $('#user').text('');
 		$('#activities').attr ('style', 'display: none;');
+	  }
 	}
 }
 
