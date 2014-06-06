@@ -1,33 +1,27 @@
 var redis = require("redis"),
 
 //throws error if 5 consecutive connections attempts are unsuccessful
-client = redis.createClient(null, null, {max_attempts:5});
+client = redis.createClient(6379, "107.170.173.86", {max_attempts:5});
 
 client.on("error", function (err) {
 	console.log(err);
 });
 
-if(!client.connected || !client.ping()) {
-	console.log("Client is not connected!!");
-}
+var test = client.get("mykey", redis.print);
 
-//if(client.ping()) {
-//	console.dir('Connection established');
-//}
-//else {
-//	//throw { name: 'Error', message: 'connection was not established' };
-//}
+console.log(test);
+
 
 
 //function addUser (name) {
-//	client.rpush("users", name);
-//	client.llen('users', function(err, count){
-//		client.ping();
-//		client.hset("user:2", "name", "frank", redis.print);
-//		client.hset(("user:" + count), "name", name, redis.print);
-//	});
+//client.rpush("users", name);
+//client.llen('users', function(err, count){
+//client.ping();
+//client.hset("user:2", "name", "frank", redis.print);
+//client.hset(("user:" + count), "name", name, redis.print);
+//});
 //}
-//
+
 //addUser("jimmy");
 //client.hset("user:3", "name", "tolga");
 
@@ -41,11 +35,11 @@ if(!client.connected || !client.ping()) {
 
 
 //for(var i = 1; i < 5; i++) {
-//	client.hgetall("user:" + i, function(err, response) {
-//		console.dir(response);
-//	});
+//client.hgetall("user:" + i, function(err, response) {
+//console.dir(response);
+//});
 //}
 //client.llen('users', function(err, ret){
-//	console.dir(ret);
+//console.dir(ret);
 //});
 client.quit();
