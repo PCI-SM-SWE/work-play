@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
 <script type="text/javascript">
-
+	
 	(function()
 	{
 		var po = document.createElement('script');
@@ -41,7 +41,7 @@
 				request.execute(function(resp)
 				{
 					console.log('Retrieved profile for: ' + resp.displayName);
-					$('#user').text(resp.displayName + ' is currently logged in.');
+					$('#user').text(resp.displayName + '(Google) is currently logged in.');
 					$('#activities').attr ('style', 'display: initial;');
 				});
 			});
@@ -56,17 +56,97 @@
 			console.log('Sign-in state: ' + authResult['error']);
 			$('#user').text('');
 			
-			var attribute = $('#dropDown').attr ('style');
 			$('#activities').attr ('style', 'display: none;');
 		}
 	}
 </script>
 
-
 </head>
 
 <body ng-controller = "mainCtrl">
 	
+<div id="fb-root"></div>
+<script>
+	
+//This is called with the results from from FB.getLoginStatus().
+function statusChangeCallback(response)
+{
+	console.log('statusChangeCallback');
+	console.log(response);
+	
+	// The response object is returned with a status field that lets the
+	// app know the current login status of the person.
+	// Full docs on the response object can be found in the documentation
+	// for FB.getLoginStatus().
+	if (response.status === 'connected')
+	{
+	  // Logged into your app and Facebook.
+		console.log ("Logged in");
+	  
+		FB.api('/me', function(response)
+		{
+		    console.log(JSON.stringify(response));
+		    var info = JSON.stringify(response).toString ();
+		    var name = info.substring (info.indexOf ('"name":') + 8);
+		    name = name.substring (0, name.indexOf('"'));
+
+			$('#user').text(name + '(Facebook) is currently logged in.');
+			$('#activities').attr ('style', 'display: initial;');
+		});
+	} 
+	else if (response.status === 'not_authorized')
+	{
+	  // The person is logged into Facebook, but not your app.
+	  console.log ("Not Authorized");
+	} 
+	else 
+	{
+	  // The person is not logged into Facebook, so we're not sure if
+	  // they are logged into this app or not.
+	  console.log ("Not logged in");
+	  $('#user').text('');
+		$('#activities').attr ('style', 'display: none;');
+	}
+}
+
+function checkLoginState()
+{
+	FB.getLoginStatus(function(response)
+	{
+		statusChangeCallback(response);
+	});
+	
+}
+
+window.fbAsyncInit = function()
+{
+	FB.init(
+	{
+		appId      : '809903392355301',
+	    cookie     : true,  // enable cookies to allow the server to access 
+	                        // the session
+	    xfbml      : true,  // parse social plugins on this page
+	    version    : 'v2.0' // use version 2.0
+	  });
+	  
+	FB.getLoginStatus(function(response)
+	{
+		statusChangeCallback(response);
+	});
+};
+
+(function(d, s, id)
+{
+	var js, fjs = d.getElementsByTagName(s)[0];
+ 	if (d.getElementById(id)) 
+ 		return;
+ 	js = d.createElement(s); js.id = id;
+ 	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+ 	fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+	
+</script>	
+
 <div class = "container">
 
 	<div class = "row">
@@ -82,8 +162,8 @@
 		
 				<div id = "user" class = "row text-center"></div>
 			
-				<br>
-			
+				<br>				
+				
 				<span id="signinButton"> 
 						<span class="g-signin"
 							data-callback="signinCallback"
@@ -92,14 +172,21 @@
 							data-requestvisibleactions="http://schemas.google.com/AddActivity"
 							data-scope="https://www.googleapis.com/auth/plus.login">
 						</span>
-				</span>		
+						
+						<div class = "btn btn-danger" ng-click = "logOut()" style = "margin-bottom: 32px;">Google+ Log Out</div>
+				</span>					
+				
+				<br>
+				
+				<div class="fb-login-button" data-max-rows="1" data-size="medium" data-auto-logout-link="true" onlogin="checkLoginState"></div>
+				
 			
 				<br>
 				<br>
 				<br>
 				
 				<div class = "row text-center">
-					<a href = "#" ng-click = "logOut()" style = "color: #FF0000;">Log Out</a>
+					
 				</div>			
 			</div>
 		</div>
@@ -130,16 +217,6 @@
 					</tr>
 				</thead>
 				<tbody id = "scoreboardBody">
-					<tr>
-						<td>1</td>
-						<td>Humphrey Huang</td>
-						<td>300</td>
-					</tr>
-					<tr>
-						<td>2</td>
-						<td>Superman Joe</td>
-						<td>250</td>
-					</tr>
 				</tbody>
 			</table>
 		</div>
