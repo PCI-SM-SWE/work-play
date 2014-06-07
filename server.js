@@ -18,41 +18,54 @@ function sendFile(response, filePath, fileContents) {
 	response.end(fileContents);
 }
 
-function serveStatic(response, cache, absPath) {
-	if (cache[absPath]) {
+function serveStatic(response, cache, absPath)
+{
+	if (cache[absPath])
+	{
 		sendFile(response, absPath, cache[absPath]);
-	} else {
-		fs.exists(absPath, function(exists) {
-			if (exists) {
-				fs.readFile(absPath, function(err, data) {
-					if (err) {
+	} 
+	else
+	{
+		fs.exists(absPath, function(exists)
+		{
+			if (exists)
+			{
+				fs.readFile(absPath, function(err, data)
+				{
+					if (err) 
 						send404(response);
-					} else {
+					else 
+					{
 						cache[absPath] = data;
 						sendFile(response, absPath, data);
 					}
 				});
-			} else {
+			} 
+			else
 				send404(response);
-			}
 		});
 	}
 }
 
-var server = http.createServer(function(request, response) {
+var server = http.createServer(function(request, response)
+{
 	var filePath = false;
-	if (request.url == '/') {
+	
+	if (request.url == '/')
 		filePath = 'public/index.html';
-	} else {
+	else 
 		filePath = 'public' + request.url;
-	}
+
 	var absPath = './' + filePath;
 	serveStatic(response, cache, absPath);
 });
 
-server.listen(3000, function() {
+server.listen(3000, function()
+{
 	console.log("Server listening on port 3000.");
 });
+
+
 
 var chatServer = require('./lib/server_handler.js');
 chatServer.listen(server);
