@@ -1,0 +1,16 @@
+{
+  "name": "work-play",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node application.js"
+  },
+  "dependencies": {
+    "redis": "0.10.3",
+    "async": "0.9.0",
+    "mime": "1.2.11",
+    "passport": "0.2.0",
+    "passport-google": "0.3.0",
+    "socket.io": "1.0.4"
+  }
+}

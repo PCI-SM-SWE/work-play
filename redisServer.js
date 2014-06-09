@@ -1,34 +1,91 @@
 var redis = require("redis"),
-    client = redis.createClient(null,"107.170.173.86",null);
-var count = 0;
+
+//throws error if 5 consecutive connections attempts are unsuccessful
+client = redis.createClient(6379, "107.170.173.86", {max_attempts:5});
+
 client.on("error", function (err) {
-    console.log("Error " + err);
-    if (count === 4) {
-	console.log("Connection timeout");
-	client.end();
-	throw { name: 'Connection Timeout', message: 'Connecting to redis took too long' };
-    }
-    count = count + 1;
-    console.log("Connection timeout in: " + (4 - count));
+	if(err) {
+		console.log(err);
+	}
 });
 
-function addUser (name) {
-    client.rpush("users", (client.llen("users") + 1));
-    client.hset("user:" + client.llen("users"), "name", name);
+function searchUser(name) {
+	client.llen("users", function(err, length) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			for(var i = 0; i < length; i++ ) {
+				client.lindex("users", i, function(err, found) {
+					if(err) {
+						console.log(err);
+					}
+					else {
+						if(found === name) {
+							console.log("found at " + i);
+						}
+					}
+				});
+			}
+		}
+	});
 }
 
-addUser("jimmy");
-
-//client.hmset("user:1", "name", "tolga", "work", "5");
-//client.hmset("user:2", "name", "bill", "work", "8");
-
-//client.hgetall("user:1", function(err, response) {
-    //console.dir(response);
-//});
-
-for(var i = 0; i < 5; i++) {
-    client.hgetall("user:" + i, function(err, response) {
-        console.dir(response);
-    });
+function addUser(first, last) {
+	var userNum;
+	client.rpush("users", first + "_" + last, function(err, reply){
+		if (err) {
+			console.log(err);
+		}
+		else{
+			userNum = reply - 1;
+			client.hmset("user" + userNum, "name", first + "_" + last, function(err, reply) {
+				if(err) {
+					console.log(err);
+				}
+			});
+		}
+	});
 }
-client.quit();
+
+function addActivity(user, activity) {
+	client.llen("users", function(err, length) {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			for(var i = 0; i < length; i++ ) {
+				client.lindex("users", i, function(err, found) {
+					if(err) {
+						console.log(err);
+					}
+					else {
+						if(found === user) {
+							console.log("found at "+ i);
+							client.lindex("points", activity, function(err, pontValue) {
+								if(err) {
+									console.log(err);
+								}
+								else {
+									client.llen("points", function(err, pontsLength) {
+										if(err) {
+											console.log(err);
+										}
+										else {
+											for(var i = 0; i < pointsLength; i++) {
+												
+											}
+										}
+									});
+								}
+							});
+						}
+					}
+				});
+			}
+		}
+	});
+}
+//addUser("humphrey", "huang");
+searchUser("humphrey_huang");
+//client.quit();
