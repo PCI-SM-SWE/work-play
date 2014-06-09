@@ -14,10 +14,15 @@
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type = "text/javascript" src = "./lib/nv.d3.js"></script>
+<link rel = "stylesheet" href = "./lib/nv.d3.css">
+
 <script type="text/javascript">
 	
 	var googleSignedOn = false;
 	var facebookSignedOn = false;
+	var name;
 	
 	(function()
 	{
@@ -30,9 +35,12 @@
 	})();
 
 	function signinCallback(authResult)
-	{
+	{		
+		console.log ("google: " + googleSignedOn);
+		console.log ("facebook: " + facebookedSignedOn);
+		
 		if (authResult['status']['signed_in'])
-		{
+		{			
 			// Update the app to reflect a signed in user
 			// Hide the sign-in button now that the user is authorized, for example:
 			//document.getElementById('signinButton').setAttribute('style', 'display: none');
@@ -45,7 +53,8 @@
 				{
 					googleSignedOn = true;
 					console.log('Retrieved profile for: ' + resp.displayName);
-					$('#user').text(resp.displayName + '(Google) is currently logged in.');
+					name = resp.displayName;
+					$('#user').text(name + '(Google) is currently logged in.');
 					$('#activities').attr ('style', 'display: initial;');
 				});
 			});
@@ -60,10 +69,18 @@
 			console.log('Sign-in state: ' + authResult['error']);
 			
 			googleSignedOn = false;
-			if (facebookSignedOn == false)
+			
+			if (authResult['error'] != 'immediate_failed')
 			{
-				$('#user').text('');					
-				$('#activities').attr ('style', 'display: none;');
+				if (facebookSignedOn == false)
+				{
+					$('#user').text('');					
+					$('#activities').attr ('style', 'display: none;');
+				}
+				else
+				{
+					$('#user').text(name + '(Facebook) is currently logged in.');
+				}
 			}
 		}
 	}
@@ -74,91 +91,101 @@
 <body ng-controller = "mainCtrl">
 	
 <div id="fb-root"></div>
+
 <script>
+
+	var info;
+	var name;
 	
-//This is called with the results from from FB.getLoginStatus().
-function statusChangeCallback(response)
-{
-	console.log('statusChangeCallback');
-	console.log(response);
-	
-	// The response object is returned with a status field that lets the
-	// app know the current login status of the person.
-	// Full docs on the response object can be found in the documentation
-	// for FB.getLoginStatus().
-	if (response.status === 'connected')
+	//This is called with the results from from FB.getLoginStatus().
+	function statusChangeCallback(response)
 	{
-	  // Logged into your app and Facebook.
-		console.log ("Logged in");
-	  
-		FB.api('/me', function(response)
+		console.log('statusChangeCallback');
+		console.log(response);
+		console.log ("google: " + googleSignedOn);
+		console.log ("facebook: " + facebookedSignedOn);
+		
+		// The response object is returned with a status field that lets the
+		// app know the current login status of the person.
+		// Full docs on the response object can be found in the documentation
+		// for FB.getLoginStatus().
+		if (response.status === 'connected')
 		{
-		    console.log(JSON.stringify(response));
-		    var info = JSON.stringify(response).toString ();
-		    var name = info.substring (info.indexOf ('"name":') + 8);
-		    name = name.substring (0, name.indexOf('"'));
-
-		    facebookSignedOn = true;
-			$('#user').text(name + '(Facebook) is currently logged in.');
-			$('#activities').attr ('style', 'display: initial;');
-		});
-	} 
-	else if (response.status === 'not_authorized')
-	{
-	  // The person is logged into Facebook, but not your app.
-	  console.log ("Not Authorized");
-	} 
-	else 
-	{
-	  // The person is not logged into Facebook, so we're not sure if
-	  // they are logged into this app or not.
-	  console.log ("Not logged in");
-	  
-	  facebookSignedOn == false;
-	  
-	  if (googleSignedOn == false)
-	  {
-	  $('#user').text('');
-		$('#activities').attr ('style', 'display: none;');
-	  }
-	}
-}
-
-function checkLoginState()
-{
-	FB.getLoginStatus(function(response)
-	{
-		statusChangeCallback(response);
-	});
+		  // Logged into your app and Facebook.
+			console.log ("Logged in");
+		  
+			FB.api('/me', function(response)
+			{
+			    console.log(JSON.stringify(response));
+			    info = JSON.stringify(response).toString ();
+			    name = info.substring (info.indexOf ('"name":') + 8);
+			    name = name.substring (0, name.indexOf('"'));
 	
-}
-
-window.fbAsyncInit = function()
-{
-	FB.init(
+			    facebookSignedOn = true;
+				$('#user').text(name + '(Facebook) is currently logged in.');
+				$('#activities').attr ('style', 'display: initial;');
+			});
+		} 
+		else if (response.status === 'not_authorized')
+		{
+			// The person is logged into Facebook, but not your app.
+			console.log ("Not Authorized");
+		} 
+		else 
+		{
+			// The person is not logged into Facebook, so we're not sure if
+			// they are logged into this app or not.
+			console.log ("Not logged in");
+			 
+			facebookSignedOn == false;
+			 
+			if (googleSignedOn == false)
+			{
+				$('#user').text('');
+				$('#activities').attr ('style', 'display: none;');
+			}
+			else
+			{
+				$('#user').text(name + '(Google) is currently logged in.');
+			}
+		}
+	}
+	
+	function checkLoginState()
 	{
-		appId      : '809903392355301',
-	    cookie     : true,  // enable cookies to allow the server to access 
-	                        // the session
-	    xfbml      : true,  // parse social plugins on this page
-	    version    : 'v2.0' // use version 2.0
-	  });
-	  
-	FB.getLoginStatus(function(response)
+		FB.getLoginStatus(function(response)
+		{
+			statusChangeCallback(response);
+		});
+		
+	}
+	
+	window.fbAsyncInit = function()
 	{
-		statusChangeCallback(response);
-	});
-};
-
-(function(d, s, id)
-{
-	var js, fjs = d.getElementsByTagName(s)[0];
- 	if (d.getElementById(id)) 
- 		return;
- 	js = d.createElement(s); js.id = id;
- 	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
- 	fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
+		FB.init(
+		{
+			appId      : '809903392355301',
+		    cookie     : true,  // enable cookies to allow the server to access 
+		                        // the session
+		    xfbml      : true,  // parse social plugins on this page
+		    version    : 'v2.0' // use version 2.0
+		  });
+		  
+		FB.getLoginStatus(function(response)
+		{
+			statusChangeCallback(response);
+		});
+	};
+	
+	(function(d, s, id)
+	{
+		var js, fjs = d.getElementsByTagName(s)[0];
+	 	if (d.getElementById(id)) 
+	 		return;
+	 	js = d.createElement(s); js.id = id;
+	 	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+	 	fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
 	
 </script>	
 
@@ -222,7 +249,16 @@ window.fbAsyncInit = function()
 			</div>
 		</div>
 		
-		<div class = "panel panel-danger row text-center col-md-4" style = "margin-left: 30%; margin-right: 40%;">
+	
+		
+		<div id = chart class = "panel panel-danger row text-center col-md-8" style = "margin-left: 15%; margin-right: 40%;">
+			<div class = "panel-heading" style = "margin-left: -15px; margin-right: -15px;">
+				<h3>Current Standings</h3>
+			</div>
+			<svg id = "chart svg" style = "height: 400px;"></svg>
+			
+			
+			<!-- 
 			<table class = "table table-bordered">
 				<thead>
 					<tr>
@@ -232,8 +268,10 @@ window.fbAsyncInit = function()
 					</tr>
 				</thead>
 				<tbody id = "scoreboardBody">
+							
 				</tbody>
 			</table>
+			-->
 		</div>
 	</div>
 </div>	

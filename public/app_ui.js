@@ -52,23 +52,55 @@ app.controller ('mainCtrl', function ($scope)
 				newArray.push (array[i].person);
 			}
 			
-			array = sort (newArray);
+//			array = sort (newArray);
+//			
+//			for (i = 0; i < array.length; i++)
+//			{
+//				console.log (array[i].name + " " + array[i].points);
+//				var tr = document.createElement ('tr');
+//				var td1 = document.createElement ('td');
+//				td1.innerHTML = i + 1;
+//				var td2 = document.createElement ('td');
+//				td2.innerHTML = array[i].name;
+//				var td3 = document.createElement ('td');
+//				td3.innerHTML = array[i].points;
+//				tr.appendChild (td1);
+//				tr.appendChild (td2);
+//				tr.appendChild (td3);
+//				$('#scoreboardBody').append (tr);				
+//			}			
 			
-			for (i = 0; i < array.length; i++)
+			var chartData = new Array ();
+			var values = new Array ();
+			
+			for (i = 0 ; i < newArray.length; i++)
 			{
-				console.log (array[i].name + " " + array[i].points);
-				var tr = document.createElement ('tr');
-				var td1 = document.createElement ('td');
-				td1.innerHTML = i + 1;
-				var td2 = document.createElement ('td');
-				td2.innerHTML = array[i].name;
-				var td3 = document.createElement ('td');
-				td3.innerHTML = array[i].points;
-				tr.appendChild (td1);
-				tr.appendChild (td2);
-				tr.appendChild (td3);
-				$('#scoreboardBody').append (tr);				
-			}			
+				values.push ({"label": newArray[i].name, "value": parseInt (newArray[i].points)});
+			}
+			
+			chartData.push ({key: "Points", values: values});
+			
+			nv.addGraph (function ()
+			{
+				var chart = nv.models.discreteBarChart ()
+							.x (function (d) { return d.label; })
+							.y (function (d) { return d.value; })
+							.staggerLabels (true)
+							.tooltips (false)
+							.showValues (true)
+							.transitionDuration (350);			
+				
+				d3.select ('#chart svg')
+					.datum (chartData)
+					.call (chart);
+				
+				nv.utils.windowResize (chart.update);
+				
+				return chart;
+			});
+			
+			
+			
 		});
 	});		
 	
