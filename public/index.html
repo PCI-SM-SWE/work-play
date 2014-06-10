@@ -35,10 +35,7 @@
 	})();
 
 	function signinCallback(authResult)
-	{		
-		console.log ("google: " + googleSignedOn);
-		console.log ("facebook: " + facebookedSignedOn);
-		
+	{				
 		if (authResult['status']['signed_in'])
 		{			
 			// Update the app to reflect a signed in user
@@ -83,6 +80,9 @@
 				}
 			}
 		}
+		
+		console.log ("google: " + googleSignedOn);
+		console.log ("facebook: " + facebookSignedOn);
 	}
 </script>
 
@@ -102,8 +102,6 @@
 	{
 		console.log('statusChangeCallback');
 		console.log(response);
-		console.log ("google: " + googleSignedOn);
-		console.log ("facebook: " + facebookedSignedOn);
 		
 		// The response object is returned with a status field that lets the
 		// app know the current login status of the person.
@@ -137,7 +135,7 @@
 			// they are logged into this app or not.
 			console.log ("Not logged in");
 			 
-			facebookSignedOn == false;
+			facebookSignedOn = false;
 			 
 			if (googleSignedOn == false)
 			{
@@ -149,6 +147,9 @@
 				$('#user').text(name + '(Google) is currently logged in.');
 			}
 		}
+		
+		console.log ("google: " + googleSignedOn);
+		console.log ("facebook: " + facebookSignedOn);
 	}
 	
 	function checkLoginState()
@@ -251,7 +252,7 @@
 		
 	
 		
-		<div id = chart class = "panel panel-danger row text-center col-md-8" style = "margin-left: 15%; margin-right: 40%;">
+		<div id = chart class = "panel panel-danger row text-center col-md-8" style = "margin-left: 14%; margin-right: 40%;">
 			<div class = "panel-heading" style = "margin-left: -15px; margin-right: -15px;">
 				<h3>Current Standings</h3>
 			</div>

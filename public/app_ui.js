@@ -149,6 +149,7 @@ app.controller ('mainCtrl', function ($scope)
 		user = user.substr (user.indexOf (' ') + 1);
 		var lastName = user.substring (0, user.indexOf ('('));
 		
+		alert ("Activity Submitted for " + firstName + " " + lastName);
 		//alert (firstName + "\n" + lastName + "\n" + activity);
 		application.submitActivity (firstName, lastName, activity);
 		//finish
